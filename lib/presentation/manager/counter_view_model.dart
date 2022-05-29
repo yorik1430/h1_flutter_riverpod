@@ -4,23 +4,17 @@ import 'package:h1_flutter_riverpod/data/models/counter_model.dart';
 import 'package:h1_flutter_riverpod/data/repository/Repository.dart';
 import 'package:h1_flutter_riverpod/domain/usecase/UseCase.dart';
 
-import 'model/view_state.dart';
-
-final viewModelProvider = ChangeNotifierProvider((ref) => ViewModel());
+final viewModelProvider = ChangeNotifierProvider((ref) => ViewModel(Repository()));
 
 class ViewModel extends ChangeNotifier {
 
-  final UseCase _useCase = Repository();
+  final UseCase _useCase;
 
   CounterModel get counter => _useCase.getCounter();
 
-  ViewState _state = ViewState.odd();
-
-  ViewState get state => _state;
-
   CounterModel get evenCounter => _useCase.getEvenCounter();
 
-  ViewModel() {
+  ViewModel(this._useCase) {
     _useCase.iniLoad();
   }
 
@@ -33,14 +27,6 @@ class ViewModel extends ChangeNotifier {
   }
 
 
-  void resetState() {
-    _state = ViewState.odd();
-    notifyListeners();
-  }
-
-  void setState(ViewState viewsState) => _state = viewsState;
-
-
   void incrementEvenCounter() {
     _useCase.incrementEvenCounter();
   }
@@ -49,14 +35,12 @@ class ViewModel extends ChangeNotifier {
     increment();
     if (isEven()) {
       setEvenState();
-    } else
-      resetState();
+    }
   }
 
 
   void setEvenState() {
     incrementEvenCounter();
-    setState(ViewState.even());
     notifyListeners();
   }
 }
